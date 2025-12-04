@@ -6,25 +6,23 @@ export function createInitialState() {
     createdAt: new Date().toISOString(),
     player: {
       name: 'wanderer',
-      x: 160,
-      y: 90,
+      x: 0,
+      y: 0,
       hunger: 0,
       thirst: 0,
       warmth: 0,
       inventory: [],
       maxInventory: 20,
       carryWeight: 0,
-      baseSpeed: 48,
-      minSpeed: 10,
+      baseSpeed: 52,
+      minSpeed: 12,
     },
     world: {
       seed: Math.random().toString(36).slice(2),
       discoveredChunks: {},
-      items: [
-        { id: 'stick-1', x: 60, y: 60, weight: 1 },
-        { id: 'stone-1', x: 200, y: 80, weight: 2 },
-        { id: 'bundle-1', x: 140, y: 120, weight: 3 },
-      ],
+      items: [],
+      npcs: [],
+      activeDialogue: null,
     },
   };
 }
@@ -45,11 +43,20 @@ export function loadState() {
 
     data.player = data.player || {};
     data.player.carryWeight = data.player.carryWeight ?? 0;
-    data.player.baseSpeed = data.player.baseSpeed ?? 48;
-    data.player.minSpeed = data.player.minSpeed ?? 10;
+    data.player.baseSpeed = data.player.baseSpeed ?? 52;
+    data.player.minSpeed = data.player.minSpeed ?? 12;
+    data.player.hunger = data.player.hunger ?? 0;
+    data.player.thirst = data.player.thirst ?? 0;
+    data.player.warmth = data.player.warmth ?? 0;
+    data.player.x = data.player.x ?? 0;
+    data.player.y = data.player.y ?? 0;
 
     data.world = data.world || {};
     data.world.items = data.world.items || [];
+    data.world.npcs = data.world.npcs || [];
+    data.world.discoveredChunks = data.world.discoveredChunks || {};
+    data.world.activeDialogue = data.world.activeDialogue || null;
+    data.world.seed = data.world.seed || Math.random().toString(36).slice(2);
 
     return data;
   } catch (err) {
