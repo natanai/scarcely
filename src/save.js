@@ -16,6 +16,9 @@ export function createInitialState() {
       carryWeight: 0,
       baseSpeed: 52,
       minSpeed: 12,
+      criticalTimer: 0,
+      isCollapsed: false,
+      collapseTimer: 0,
     },
     world: {
       seed: Math.random().toString(36).slice(2),
@@ -23,6 +26,7 @@ export function createInitialState() {
       items: [],
       npcs: [],
       activeDialogue: null,
+      npcStates: {},
     },
   };
 }
@@ -50,6 +54,11 @@ export function loadState() {
     data.player.warmth = data.player.warmth ?? 0;
     data.player.x = data.player.x ?? 0;
     data.player.y = data.player.y ?? 0;
+    data.player.inventory = data.player.inventory || [];
+    data.player.maxInventory = data.player.maxInventory ?? 20;
+    data.player.criticalTimer = data.player.criticalTimer ?? 0;
+    data.player.isCollapsed = data.player.isCollapsed ?? false;
+    data.player.collapseTimer = data.player.collapseTimer ?? 0;
 
     data.world = data.world || {};
     data.world.items = data.world.items || [];
@@ -57,6 +66,7 @@ export function loadState() {
     data.world.discoveredChunks = data.world.discoveredChunks || {};
     data.world.activeDialogue = data.world.activeDialogue || null;
     data.world.seed = data.world.seed || Math.random().toString(36).slice(2);
+    data.world.npcStates = data.world.npcStates || {};
 
     return data;
   } catch (err) {

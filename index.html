@@ -18,6 +18,22 @@
           <input id="importFile" type="file" accept="application/json" />
         </label>
         <button id="importButton" type="button">Import</button>
+        <button id="backpackToggle" type="button">Backpack (B)</button>
+      </section>
+
+      <section class="backpack" id="backpackPanel" aria-label="Backpack" aria-hidden="true" data-open="false">
+        <header class="backpack__header">
+          <div>
+            <p class="backpack__label">Inventory</p>
+            <p class="backpack__meta" id="inventoryMeta">0/0 slots · 0kg burden</p>
+          </div>
+          <div class="backpack__actions">
+            <button id="useItem" type="button">Use</button>
+            <button id="dropItem" type="button">Drop</button>
+          </div>
+        </header>
+        <ul class="inventory" id="inventoryList"></ul>
+        <p class="backpack__hint">Open/close with <kbd>B</kbd>. Click an item, then use or drop it to change your burden.</p>
       </section>
 
       <section class="tutorial" aria-label="How to play">
@@ -33,6 +49,7 @@
           <li>
             <strong>Watch your needs</strong>. Forage for food, sip water pools, and warm up with embers before the meters fill.
           </li>
+          <li><strong>Manage the pack</strong> with <kbd>B</kbd>. Use or drop items to keep your burden bearable.</li>
           <li>
             <strong>Keep keepsakes</strong> to ease all needs a little when supplies run low.
           </li>
