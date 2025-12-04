@@ -8,6 +8,14 @@ import {
 const CHUNK_SIZE = 96;
 const VIEW_DISTANCE = 2;
 const INTERACT_RADIUS = 14;
+const SPRITE_PATHS = {
+  player: './assets/player.svg',
+  npc: './assets/npc.svg',
+  forage: './assets/forage.svg',
+  water: './assets/water.svg',
+  ember: './assets/ember.svg',
+  keepsake: './assets/keepsake.svg',
+};
 const ITEM_TYPES = {
   forage: { color: '#c3c68f', weight: 1, hunger: -18 },
   water: { color: '#83c5ff', weight: 1.5, thirst: -22 },
@@ -93,13 +101,38 @@ function pickDialogue(rand) {
   return phrases[Math.floor(rand() * phrases.length)];
 }
 
-function setup() {
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+async function loadSprites() {
+  const pairs = await Promise.all(
+    Object.entries(SPRITE_PATHS).map(async ([key, src]) => ({
+      key,
+      img: await loadImage(src),
+    }))
+  );
+
+  return Object.fromEntries(pairs.map(({ key, img }) => [key, img]));
+}
+
+async function setup() {
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
 
   const exportButton = document.getElementById('exportButton');
   const importFile = document.getElementById('importFile');
   const importButton = document.getElementById('importButton');
+
+  const sprites = await loadSprites().catch((err) => {
+    console.error('Failed to load sprites; falling back to primitives.', err);
+    return {};
+  });
 
   let state = loadState();
   state.world.items = state.world.items || [];
@@ -136,7 +169,7 @@ function setup() {
     lastTime = now;
 
     const currentSpeed = update(state, keys, dt);
-    draw(ctx, state, canvas, currentSpeed, now / 1000);
+    draw(ctx, state, sprites, canvas, currentSpeed, now / 1000);
 
     saveState(state);
 
@@ -259,7 +292,7 @@ function cullFarEntities(state, player) {
   );
 }
 
-function draw(ctx, state, canvas, currentSpeed, time) {
+function draw(ctx, state, sprites, canvas, currentSpeed, time) {
   const player = state.player;
   const palette = getPaletteAt(state, player.x, player.y);
 
@@ -272,9 +305,9 @@ function draw(ctx, state, canvas, currentSpeed, time) {
   const cameraY = player.y - canvas.height / 2;
 
   drawGroundTexture(ctx, palette, cameraX, cameraY, canvas);
-  drawItems(ctx, state.world.items, palette, cameraX, cameraY, time);
-  drawNpcs(ctx, state.world.npcs, palette, cameraX, cameraY, time);
-  drawPlayer(ctx, player, palette, cameraX, cameraY, currentSpeed, time);
+  drawItems(ctx, state.world.items, palette, cameraX, cameraY, time, sprites);
+  drawNpcs(ctx, state.world.npcs, palette, cameraX, cameraY, time, sprites);
+  drawPlayer(ctx, player, palette, cameraX, cameraY, currentSpeed, time, sprites);
 
   ctx.restore();
   drawAtmosphere(ctx, canvas, state.player);
@@ -301,34 +334,46 @@ function drawGroundTexture(ctx, palette, cameraX, cameraY, canvas) {
   ctx.globalAlpha = 1;
 }
 
-function drawItems(ctx, items, palette, cameraX, cameraY, time) {
+function drawItems(ctx, items, palette, cameraX, cameraY, time, sprites) {
   for (const item of items) {
     const info = ITEM_TYPES[item.type] || { color: palette.light };
     const screenX = item.x - cameraX;
     const screenY = item.y - cameraY;
 
-    ctx.fillStyle = info.color;
     const bob = Math.sin(time * 3 + (item.x + item.y) * 0.05) * 1.5;
-    ctx.fillRect(screenX - 3, screenY - 3 + bob, 6, 6);
+    const sprite = sprites[item.type];
+    if (sprite) {
+      const size = 20;
+      ctx.drawImage(sprite, screenX - size / 2, screenY - size / 2 + bob, size, size);
+    } else {
+      ctx.fillStyle = info.color;
+      ctx.fillRect(screenX - 3, screenY - 3 + bob, 6, 6);
+    }
   }
 }
 
-function drawNpcs(ctx, npcs, palette, cameraX, cameraY, time) {
+function drawNpcs(ctx, npcs, palette, cameraX, cameraY, time, sprites) {
   ctx.fillStyle = palette.mood;
   for (const npc of npcs) {
     const screenX = npc.x - cameraX;
     const screenY = npc.y - cameraY;
     const pulse = 1 + Math.sin(time * 2.5 + npc.x * 0.01) * 0.4;
-    ctx.beginPath();
-    ctx.moveTo(screenX, screenY - 6 * pulse);
-    ctx.lineTo(screenX - 4 * pulse, screenY + 4 * pulse);
-    ctx.lineTo(screenX + 4 * pulse, screenY + 4 * pulse);
-    ctx.closePath();
-    ctx.fill();
+    const sprite = sprites.npc;
+    if (sprite) {
+      const size = 22 + pulse * 2;
+      ctx.drawImage(sprite, screenX - size / 2, screenY - size / 2, size, size);
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(screenX, screenY - 6 * pulse);
+      ctx.lineTo(screenX - 4 * pulse, screenY + 4 * pulse);
+      ctx.lineTo(screenX + 4 * pulse, screenY + 4 * pulse);
+      ctx.closePath();
+      ctx.fill();
+    }
   }
 }
 
-function drawPlayer(ctx, player, palette, cameraX, cameraY, currentSpeed, time) {
+function drawPlayer(ctx, player, palette, cameraX, cameraY, currentSpeed, time, sprites) {
   const screenX = player.x - cameraX;
   const screenY = player.y - cameraY;
 
@@ -338,15 +383,21 @@ function drawPlayer(ctx, player, palette, cameraX, cameraY, currentSpeed, time) 
   ctx.save();
   ctx.translate(screenX, screenY + wobble);
 
-  const packHeight = 6 + burden * 10;
-  const packWidth = 8 + burden * 4;
-  ctx.fillStyle = palette.haze;
-  ctx.globalAlpha = 0.7;
-  ctx.fillRect(-packWidth / 2, -packHeight - 2, packWidth, packHeight);
-  ctx.globalAlpha = 1;
+  const sprite = sprites.player;
+  if (sprite) {
+    const size = 28 + burden * 6;
+    ctx.drawImage(sprite, -size / 2, -size / 2 - burden * 3, size, size);
+  } else {
+    const packHeight = 6 + burden * 10;
+    const packWidth = 8 + burden * 4;
+    ctx.fillStyle = palette.haze;
+    ctx.globalAlpha = 0.7;
+    ctx.fillRect(-packWidth / 2, -packHeight - 2, packWidth, packHeight);
+    ctx.globalAlpha = 1;
 
-  ctx.fillStyle = palette.light;
-  ctx.fillRect(-4, -4, 8, 8);
+    ctx.fillStyle = palette.light;
+    ctx.fillRect(-4, -4, 8, 8);
+  }
 
   const stumble = Math.max(0, 1 - currentSpeed / (player.baseSpeed || 48));
   if (stumble > 0.25) {
