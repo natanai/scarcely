@@ -13,10 +13,18 @@ export function createInitialState() {
       warmth: 0,
       inventory: [],
       maxInventory: 20,
+      carryWeight: 0,
+      baseSpeed: 48,
+      minSpeed: 10,
     },
     world: {
       seed: Math.random().toString(36).slice(2),
       discoveredChunks: {},
+      items: [
+        { id: 'stick-1', x: 60, y: 60, weight: 1 },
+        { id: 'stone-1', x: 200, y: 80, weight: 2 },
+        { id: 'bundle-1', x: 140, y: 120, weight: 3 },
+      ],
     },
   };
 }
@@ -34,6 +42,14 @@ export function loadState() {
       console.warn('Unsupported save version; starting new game.', data.version);
       return createInitialState();
     }
+
+    data.player = data.player || {};
+    data.player.carryWeight = data.player.carryWeight ?? 0;
+    data.player.baseSpeed = data.player.baseSpeed ?? 48;
+    data.player.minSpeed = data.player.minSpeed ?? 10;
+
+    data.world = data.world || {};
+    data.world.items = data.world.items || [];
 
     return data;
   } catch (err) {
