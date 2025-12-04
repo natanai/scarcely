@@ -45,6 +45,80 @@ canvas {
   gap: 0.5rem;
 }
 
+.backpack {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.85rem;
+  display: grid;
+  gap: 0.5rem;
+  opacity: 0.25;
+  filter: blur(1px);
+  transition: opacity 160ms ease, filter 160ms ease, transform 160ms ease;
+}
+
+.backpack[data-open='true'] {
+  opacity: 1;
+  filter: none;
+  transform: translateY(0);
+}
+
+.backpack__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.backpack__label {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.backpack__meta {
+  margin: 0.15rem 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.backpack__actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.inventory {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.inventory__item {
+  padding: 0.5rem 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.inventory__item:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.inventory__item.is-selected {
+  border-color: var(--accent);
+  background: rgba(201, 168, 106, 0.15);
+}
+
+.backpack__hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .tutorial {
   padding: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.06);
