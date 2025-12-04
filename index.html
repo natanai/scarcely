@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Scarcely – Web Prototype</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <canvas id="gameCanvas" width="320" height="180" aria-label="Scarcely game view"></canvas>
+
+      <section class="ui" aria-label="Save controls">
+        <button id="exportButton" type="button">Export Save</button>
+
+        <label class="import-label">
+          <span>Import Save</span>
+          <input id="importFile" type="file" accept="application/json" />
+        </label>
+        <button id="importButton" type="button">Import</button>
+      </section>
+    </main>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
