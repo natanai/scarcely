@@ -45,6 +45,48 @@ canvas {
   gap: 0.5rem;
 }
 
+.tutorial {
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  display: grid;
+  gap: 0.75rem;
+}
+
+.tutorial__header h1 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.tutorial__header p {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.tutorial__steps {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.4rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.tutorial__steps strong {
+  color: var(--text);
+}
+
+kbd {
+  padding: 0.1rem 0.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 0.85em;
+  font-family: inherit;
+}
+
 button,
 .import-label {
   padding: 0.65rem 0.75rem;
@@ -102,5 +144,9 @@ button:focus-visible,
 
   .import-label {
     justify-content: space-between;
+  }
+
+  .tutorial {
+    padding: 0.85rem;
   }
 }
